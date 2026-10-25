@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>R2G 온라인 영업·마케팅 캘린더</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:#f6f7f9;color:#20242b}
+.app{display:flex;min-height:100vh}.sidebar{width:220px;background:#1f2937;color:white;padding:20px 16px}.brand{font-weight:700;font-size:18px;margin-bottom:22px}.menu{display:flex;flex-direction:column;gap:8px}.menu div{padding:10px 12px;border-radius:8px;color:#d1d5db}.menu .active{background:#374151;color:#fff}.main{flex:1;padding:20px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.left-controls{display:flex;gap:8px;align-items:center}.btn{border:1px solid #d7dbe0;background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}.btn.primary{background:#111827;color:white;border-color:#111827}.month{font-size:22px;font-weight:700;margin:0 8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{background:#fff;border:1px solid #d7dbe0;border-radius:999px;padding:7px 10px;font-size:13px}.calendar{background:white;border:1px solid #dde1e6;border-radius:12px;overflow:hidden}.weekdays,.grid{display:grid;grid-template-columns:repeat(7,1fr)}.weekdays div{padding:10px;text-align:center;font-size:13px;font-weight:700;background:#f3f4f6;border-right:1px solid #e5e7eb}.weekdays div:last-child{border-right:none}.day{min-height:150px;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:8px;position:relative}.day:nth-child(7n){border-right:none}.date{font-size:13px;font-weight:700;margin-bottom:6px}.muted{color:#9ca3af}.event{font-size:12px;border-radius:6px;padding:6px 7px;margin:5px 0;display:flex;align-items:center;gap:6px;line-height:1.25}.event small{opacity:.75}.promo{background:#fde2e2}.sales{background:#dbeafe}.marketing{background:#ede9fe}.content{background:#dcfce7}.meeting{background:#e0f2fe}.ops{background:#e5e7eb}.urgent{background:#ffedd5}.dot{width:7px;height:7px;border-radius:50%;background:#111827;flex:none}.done{text-decoration:line-through;opacity:.55}.panel{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#fff;border:1px solid #dde1e6;border-radius:12px;padding:14px}.card h3{margin:0 0 10px;font-size:15px}.taskrow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #eef0f2;font-size:13px}.taskrow:last-child{border-bottom:none}.assignee{font-size:12px;color:#6b7280;white-space:nowrap}@media(max-width:900px){.sidebar{display:none}.main{padding:10px}.day{min-height:120px;padding:5px}.event{font-size:11px;padding:4px}.panel{grid-template-columns:1fr}.month{font-size:18px}}
+</style>
+
+<style>
+.modal-bg{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:50;padding:16px}.modal-bg.show{display:flex}.modal{background:#fff;width:min(520px,100%);border-radius:14px;padding:18px;box-shadow:0 20px 60px #0003}.modal h2{margin:0 0 14px;font-size:18px}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700}.field.full{grid-column:1/-1}.field input,.field select,.field textarea{border:1px solid #d7dbe0;border-radius:8px;padding:9px;font:inherit}.field textarea{min-height:80px}.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.event{cursor:pointer}.day{cursor:default}.date-add{float:right;border:0;background:transparent;color:#9ca3af;cursor:pointer;font-size:16px}.chip select{border:0;background:transparent;font:inherit;color:inherit}.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">R2G 업무 캘린더</div>
+    <div class="menu">
+      <div class="active">월간 캘린더</div>
+      <div>이번 주 업무</div>
+      <div>미완료 업무</div>
+      <div>완료/히스토리</div>
+      <div>설정</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="left-controls">
+        <button class="btn" id="prevMonth">‹</button><span class="month" id="monthTitle">2026년 10월</span><button class="btn" id="nextMonth">›</button>
+        <button class="btn" id="todayBtn">오늘</button>
+      </div>
+      <button class="btn primary" id="addTaskBtn">+ 업무 추가</button>
+    </div>
+    <div class="filters">
+      <div class="chip">담당자: <select id="fAssignee"><option value="">전체</option></select></div>
+      <div class="chip">업무구분: <select id="fCategory"><option value="">전체</option></select></div>
+      <div class="chip">상태: <select id="fStatus"><option value="">전체</option><option>예정</option><option>진행중</option><option>확인필요</option><option>완료</option></select></div>
+      <div class="chip">채널: <select id="fChannel"><option value="">전체</option><option>공통</option><option>자사몰</option><option>네이버</option><option>쿠팡</option><option>골프존</option><option>SNS</option><option>유튜브</option><option>오프라인</option><option>기타</option></select></div>
+    </div>
+    <section class="calendar">
+      <div class="weekdays"><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div></div>
+      <div class="grid" id="calendarGrid"></div>
+    </section>
+    <section class="panel">
+      <div class="card"><h3>이번 주 미완료</h3><div id="weekList"></div></div>
+      <div class="card"><h3>사용 방법</h3><div class="taskrow"><span>날짜의 + 또는 우측 상단 + 업무 추가</span></div><div class="taskrow"><span>업무 클릭 시 수정/완료 처리</span></div><div class="taskrow"><span>내용은 이 브라우저에 자동 저장</span></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">업무 추가</h2>
+    <div class="form">
+      <div class="field full"><label>업무명</label><input id="tTitle" placeholder="예: 10월 네이버 행사 가격 확정"></div>
+      <div class="field"><label>날짜</label><input type="date" id="tDate"></div>
+      <div class="field"><label>담당자</label><select id="tAssignee"></select></div>
+      <div class="field"><label>업무구분</label><select id="tCategory"></select></div>
+      <div class="field"><label>상태</label><select id="tStatus"><option>예정</option><option>진행중</option><option>확인필요</option><option>완료</option></select></div>
+      <div class="field"><label>채널</label><select id="tChannel"><option>공통</option><option>자사몰</option><option>네이버</option><option>쿠팡</option><option>골프존</option><option>SNS</option><option>유튜브</option><option>오프라인</option><option>기타</option></select></div>
+      <div class="field full"><label>메모</label><textarea id="tNote" placeholder="세부 체크사항이나 메모"></textarea></div>
+    </div>
+    <div class="modal-actions"><button class="btn" id="deleteBtn">삭제</button><button class="btn" id="cancelBtn">취소</button><button class="btn primary" id="saveBtn">저장</button></div>
+  </div>
+</div>
+<script>
+const A=["소진","MD1","MD2","마케터"], C=["행사","영업","마케팅","상품","운영","회의","긴급"], K="r2g_calendar_v2";
+const seed=[
+{id:1,title:"PGA쇼 견적 확인",date:"2026-10-02",assignee:"소진",category:"영업",status:"진행중",channel:"기타",note:""},
+{id:2,title:"쿠팡 가격 체크",date:"2026-10-02",assignee:"MD2",category:"운영",status:"예정",channel:"쿠팡",note:""},
+{id:3,title:"주간 온라인회의",date:"2026-10-05",assignee:"소진",category:"회의",status:"예정",channel:"공통",note:""},
+{id:4,title:"네이버 행사 세팅",date:"2026-10-06",assignee:"MD1",category:"행사",status:"진행중",channel:"네이버",note:""},
+{id:5,title:"상세페이지 수정",date:"2026-10-07",assignee:"마케터",category:"상품",status:"진행중",channel:"자사몰",note:""},
+{id:6,title:"슈퍼위크 가격 확정",date:"2026-10-08",assignee:"소진",category:"행사",status:"확인필요",channel:"네이버",note:""},
+{id:7,title:"인스타 광고 소재 전달",date:"2026-10-08",assignee:"마케터",category:"마케팅",status:"예정",channel:"SNS",note:""},
+{id:8,title:"골프존 가격 모니터링",date:"2026-10-09",assignee:"MD2",category:"운영",status:"완료",channel:"골프존",note:""}
+];
+let tasks=JSON.parse(localStorage.getItem(K)||"null")||seed; let cur=new Date(2026,9,1), editing=null;
+const $=q=>document.querySelector(q), pad=n=>String(n).padStart(2,"0"), iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function addOpts(id,arr){arr.forEach(v=>{const o=document.createElement("option");o.value=o.textContent=v;$(id).appendChild(o)})}
+addOpts("#fAssignee",A);addOpts("#fCategory",C);addOpts("#tAssignee",A);addOpts("#tCategory",C);
+function save(){localStorage.setItem(K,JSON.stringify(tasks))}
+function filt(list){const a=$("#fAssignee").value,c=$("#fCategory").value,s=$("#fStatus").value,ch=$("#fChannel").value;return list.filter(t=>(!a||t.assignee===a)&&(!c||t.category===c)&&(!s||t.status===s)&&(!ch||t.channel===ch))}
+function cls(c){return {행사:"promo",영업:"sales",마케팅:"marketing",상품:"content",운영:"ops",회의:"meeting",긴급:"urgent"}[c]||"ops"}
+function render(){const y=cur.getFullYear(),m=cur.getMonth();$("#monthTitle").textContent=`${y}년 ${m+1}월`;const g=$("#calendarGrid");g.innerHTML="";const first=new Date(y,m,1),start=new Date(y,m,1-first.getDay()+1); if(first.getDay()===0) start.setDate(start.getDate()-7);
+for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const di=iso(d),cell=document.createElement("div");cell.className="day";const muted=d.getMonth()!==m?" muted":"";cell.innerHTML=`<div class="date${muted}">${d.getDate()}<button class="date-add">+</button></div>`;cell.querySelector(".date-add").onclick=()=>open(null,di);filt(tasks.filter(t=>t.date===di)).forEach(t=>{const e=document.createElement("div");e.className=`event ${cls(t.category)} ${t.status==="완료"?"done":""}`;e.innerHTML=`<span class="dot"></span>${esc(t.title)} <small>${esc(t.assignee)}</small>`;e.onclick=()=>open(t.id);cell.appendChild(e)});g.appendChild(cell)} renderWeek();}
+function renderWeek(){const box=$("#weekList"), now=new Date(), s=new Date(now);s.setHours(0,0,0,0);s.setDate(s.getDate()-((s.getDay()+6)%7));const e=new Date(s);e.setDate(s.getDate()+6);const list=filt(tasks).filter(t=>t.status!=="완료").filter(t=>{const d=new Date(t.date+"T00:00:00");return d>=s&&d<=e}).sort((a,b)=>a.date.localeCompare(b.date));box.innerHTML=list.length?"":"<div class='taskrow'><span>이번 주 미완료 업무가 없습니다.</span></div>";list.forEach(t=>{const r=document.createElement("div");r.className="taskrow";r.innerHTML=`<span>${esc(t.title)}</span><span class="assignee">${esc(t.assignee)} · ${t.date.slice(5)}</span>`;r.onclick=()=>open(t.id);box.appendChild(r)})}
+function open(id,date){editing=id;$("#modalTitle").textContent=id?"업무 수정":"업무 추가";$("#deleteBtn").style.visibility=id?"visible":"hidden";if(id){const t=tasks.find(x=>x.id===id);$("#tTitle").value=t.title;$("#tDate").value=t.date;$("#tAssignee").value=t.assignee;$("#tCategory").value=t.category;$("#tStatus").value=t.status;$("#tChannel").value=t.channel;$("#tNote").value=t.note||""}else{$("#tTitle").value="";$("#tDate").value=date||iso(new Date());$("#tAssignee").value=A[0];$("#tCategory").value=C[0];$("#tStatus").value="예정";$("#tChannel").value="공통";$("#tNote").value=""}$("#modalBg").classList.add("show")}
+function close(){$("#modalBg").classList.remove("show");editing=null}
+$("#saveBtn").onclick=()=>{const title=$("#tTitle").value.trim(),date=$("#tDate").value;if(!title||!date){alert("업무명과 날짜를 입력해 주세요.");return}const d={title,date,assignee:$("#tAssignee").value,category:$("#tCategory").value,status:$("#tStatus").value,channel:$("#tChannel").value,note:$("#tNote").value.trim()};if(editing){const i=tasks.findIndex(x=>x.id===editing);tasks[i]={...tasks[i],...d}}else tasks.push({id:Date.now(),...d});save();close();render()};
+$("#deleteBtn").onclick=()=>{if(editing&&confirm("이 업무를 삭제할까요?")){tasks=tasks.filter(x=>x.id!==editing);save();close();render()}};$("#cancelBtn").onclick=close;$("#modalBg").onclick=e=>{if(e.target.id==="modalBg")close()};$("#addTaskBtn").onclick=()=>open();
+$("#prevMonth").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);render()};$("#nextMonth").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);render()};$("#todayBtn").onclick=()=>{const d=new Date();cur=new Date(d.getFullYear(),d.getMonth(),1);render()};["#fAssignee","#fCategory","#fStatus","#fChannel"].forEach(id=>$(id).onchange=render);
+function esc(s=""){return String(s).replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\\"":"&quot;","'":"&#039;"}[m]||m))}
+render();
+</script>
+</body>
+</html>
+
